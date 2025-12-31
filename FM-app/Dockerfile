@@ -20,7 +20,7 @@ RUN mkdir -p /var/www/html/data
 
 # Create Seeds for Data Persistence
 # 1. Database Seed
-RUN cp database.sqlite /var/www/html/database_seed.sqlite
+COPY database_template.sqlite /var/www/html/database_seed.sqlite
 
 # 2. Uploads Seed (Backup existing uploads to seed folder)
 RUN mkdir -p /var/www/html/uploads_seed && \
