@@ -54,15 +54,9 @@ ENV DB_PATH=/var/www/html/data/database.sqlite
 # Prepare Data Directory
 RUN mkdir -p /var/www/html/data
 
-<<<<<<< HEAD:FM-app/Dockerfile
-# Create Seeds for Data Persistence
-# 1. Database Seed
-COPY database_template.sqlite /var/www/html/database_seed.sqlite
-=======
 # Initialize Fresh Database (No Dummy Data)
 RUN DB_PATH=/var/www/html/data/database.sqlite php /var/www/html/backend/init_fresh_database.php && \
     mv /var/www/html/data/database.sqlite /var/www/html/database_seed.sqlite
->>>>>>> cc2d4d1065f0271819289c4ba08200cd7314b8db:Dockerfile
 
 # Create empty uploads seed folder (for clean installation)
 RUN mkdir -p /var/www/html/uploads_seed
