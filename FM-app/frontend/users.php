@@ -134,8 +134,22 @@ if ($_SESSION['user']['role'] !== 'admin') {
         async function loadUsers() {
             try {
                 const response = await fetch('../backend/users.php?action=list_users');
+                
+                if (response.status === 401) {
+                    window.location.href = 'login.php';
+                    return;
+                }
+
                 const users = await response.json();
                 
+                if (users.error) {
+                    console.error('Error loading users:', users.error);
+                    if (users.redirect) {
+                        window.location.href = users.redirect;
+                    }
+                    return;
+                }
+
                 const tbody = document.getElementById('users-table-body');
                 tbody.innerHTML = '';
                 
@@ -250,6 +264,11 @@ if ($_SESSION['user']['role'] !== 'admin') {
             const action = id ? 'update_user' : 'add_user';
             
             formData.append('action', action);
+            // csrf_token is already in the form as a hidden input, so FormData picks it up automatically.
+            // But let's ensure it's there just in case (e.g. if the input is outside the form or something).
+            if (!formData.has('csrf_token')) {
+                 formData.append('csrf_token', document.getElementById('csrf_token').value);
+            }
 
             try {
                 const response = await fetch('../backend/users.php', {

@@ -1,4 +1,6 @@
 <?php
+ob_start();
+ini_set('display_errors', 0);
 require_once 'db.php';
 require_once 'auth.php';
 require_once 'csrf_helper.php';
@@ -72,6 +74,10 @@ function listUsers() {
     // Don't send passwords back
     $stmt = $pdo->query("SELECT id, username, full_name, email, role, created_at FROM users ORDER BY username");
     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Clear buffer one last time before output
+    if (ob_get_length()) ob_clean();
+    
     echo json_encode($users);
 }
 
@@ -223,6 +229,38 @@ function updateUser($id, $data) {
             $id
         ]);
     }
+
+    echo json_encode(['success' => true]);
+}
+
+function updateProfile($id, $data) {
+    global $pdo;
+    
+    // Allow updating full_name, email, and password. Role cannot be changed here.
+    
+    if (!empty($data['password'])) {
+        $hashed_password = password_hash($data['password'], PASSWORD_DEFAULT);
+        $sql = "UPDATE users SET full_name = ?, email = ?, password = ? WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $data['full_name'],
+            $data['email'],
+            $hashed_password,
+            $id
+        ]);
+    } else {
+        $sql = "UPDATE users SET full_name = ?, email = ? WHERE id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([
+            $data['full_name'],
+            $data['email'],
+            $id
+        ]);
+    }
+    
+    // Update session data
+    $_SESSION['user']['full_name'] = $data['full_name'];
+    $_SESSION['user']['email'] = $data['email'];
 
     echo json_encode(['success' => true]);
 }

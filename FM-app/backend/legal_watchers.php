@@ -1,8 +1,16 @@
 <?php
+ob_start();
+ini_set('display_errors', 0);
 require_once 'db.php';
 require_once 'auth.php';
 
+// Ensure user is logged in
+requireLogin();
+
 header('Content-Type: application/json; charset=utf-8');
+
+// Ensure no previous output
+ob_clean();
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
@@ -119,6 +127,8 @@ if ($action === 'check_updates') {
         }
     }
 
+    // Clear buffer
+    if (ob_get_length()) ob_clean();
     echo json_encode(['success' => true, 'new_updates' => $newUpdates, 'details' => $results]);
     exit;
 }
@@ -135,6 +145,8 @@ if ($action === 'list_updates') {
     $stmt = $pdo->query($sql);
     $updates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Clear buffer
+    if (ob_get_length()) ob_clean();
     echo json_encode(['success' => true, 'updates' => $updates]);
     exit;
 }
@@ -163,4 +175,3 @@ if ($action === 'process_update') {
     }
     exit;
 }
-?>

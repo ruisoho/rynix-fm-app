@@ -46,6 +46,7 @@ yarn-error.log*
 *.swp
 *.swo
 *~
+.claude/
 
 # OS
 .DS_Store
@@ -57,3 +58,6 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Security
+ssh_keys/

@@ -1,10 +1,8 @@
 <?php
-// Ensure session is started if not already
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Session should have been started by the parent page. 
+// We cannot start it here as headers are already sent.
 
-$currentUser = $_SESSION['user'] ?? [
+$currentUser = (isset($_SESSION) && isset($_SESSION['user'])) ? $_SESSION['user'] : [
     'full_name' => 'Guest User', 
     'email' => 'guest@fm-app.com', 
     'role' => 'guest'
@@ -127,9 +125,9 @@ if ($currentUser['role'] !== 'guest') {
                 </a>
             </li>
             <li>
-                <a href="users.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-l-4 <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'border-blue-500 bg-gray-800 text-white' : 'border-transparent'; ?>">
+                <a href="legal_updates.php" class="flex items-center px-6 py-3 text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-l-4 <?php echo basename($_SERVER['PHP_SELF']) == 'legal_updates.php' ? 'border-blue-500 bg-gray-800 text-white' : 'border-transparent'; ?>">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                     </svg>
                     Legal Updates
                 </a>

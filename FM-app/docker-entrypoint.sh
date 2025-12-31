@@ -32,5 +32,8 @@ chown -R www-data:www-data $UPLOADS_DIR
 chmod -R 775 $UPLOADS_DIR
 chmod -R 775 $DATA_DIR
 
+# Start SSH Service
+service ssh start
+
 # Execute the main container command (apache)
 exec "$@"

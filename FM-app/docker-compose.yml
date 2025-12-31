@@ -6,8 +6,10 @@ services:
     container_name: fm_app_legal_os
     restart: always
     ports:
-      - "80:80"
+      - "8080:80"
+      - "2222:22"
     volumes:
+      - .:/var/www/html
       - fm_data:/var/www/html/data
       - fm_uploads:/var/www/html/uploads
     environment:

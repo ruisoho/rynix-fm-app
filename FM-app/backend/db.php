@@ -198,11 +198,56 @@ try {
         type TEXT NOT NULL, -- Physical, Key Card, Fob, Master
         status TEXT DEFAULT 'Available', -- Available, Issued, Lost, Broken
         qr_code TEXT UNIQUE,
-        keys_in_bundle INTEGER DEFAULT 1,
-        is_master INTEGER DEFAULT 0,
-        allowed_roles TEXT, -- Comma separated roles e.g. 'Admin,Staff'
+        assigned_to INTEGER, -- User ID
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (facility_id) REFERENCES facilities(id) ON DELETE CASCADE
+        FOREIGN KEY (facility_id) REFERENCES facilities(id) ON DELETE CASCADE,
+        FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
+    // --- Document Management Tables ---
+
+    // Create documents table
+    $pdo->exec("CREATE TABLE IF NOT EXISTS documents (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        filename TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        mime_type TEXT,
+        file_size INTEGER,
+        uploaded_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
+    // Create collections table (Folders)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS collections (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        parent_id INTEGER,
+        created_by INTEGER,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (parent_id) REFERENCES collections(id) ON DELETE CASCADE,
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+    )");
+
+    // Create collection_items table (Many-to-Many: Documents <-> Collections)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS collection_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        collection_id INTEGER NOT NULL,
+        document_id INTEGER NOT NULL,
+        added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE CASCADE,
+        FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE,
+        UNIQUE(collection_id, document_id)
+    )");
+
+    // Create document_links table (Polymorphic: Documents <-> Entities like Tasks, Logs)
+    $pdo->exec("CREATE TABLE IF NOT EXISTS document_links (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        document_id INTEGER NOT NULL,
+        owner_type TEXT NOT NULL, -- 'maintenance', 'task', 'invoice', 'project', 'obligation'
+        owner_id INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (document_id) REFERENCES documents(id) ON DELETE CASCADE
     )");
 
     // Add new columns to keys table if they don't exist (for existing DBs)

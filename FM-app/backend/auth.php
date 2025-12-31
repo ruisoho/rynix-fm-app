@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once 'db.php';
 require_once 'csrf_helper.php';
 
@@ -73,10 +75,14 @@ if ((isset($_GET['action']) && $_GET['action'] === 'logout') || (isset($_POST['a
 // Check Authentication Function
 function requireLogin() {
     if (!isset($_SESSION['user_id'])) {
-        // If it's an API request, return 401
-        if (isset($_SERVER['HTTP_HX_REQUEST']) || isset($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+        // If it's an API request (HTMX, AJAX, or accessing backend directly), return 401
+        if (isset($_SERVER['HTTP_HX_REQUEST']) || 
+            isset($_SERVER['HTTP_X_REQUESTED_WITH']) || 
+            strpos($_SERVER['SCRIPT_NAME'], '/backend/') !== false) {
+            
             http_response_code(401);
-            echo "Unauthorized";
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Unauthorized', 'redirect' => '../frontend/login.php']);
             exit;
         }
         header("Location: login.php");
@@ -107,4 +113,4 @@ function requireLogin() {
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
-?>
+
