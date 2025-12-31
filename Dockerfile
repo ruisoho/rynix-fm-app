@@ -48,16 +48,18 @@ WORKDIR /var/www/html
 # Copy application files
 COPY . /var/www/html
 
+# Environment Variables
+ENV DB_PATH=/var/www/html/data/database.sqlite
+
 # Prepare Data Directory
 RUN mkdir -p /var/www/html/data
 
-# Create Seeds for Data Persistence
-# 1. Database Seed
-COPY database_template.sqlite /var/www/html/database_seed.sqlite
+# Initialize Fresh Database (No Dummy Data)
+RUN DB_PATH=/var/www/html/data/database.sqlite php /var/www/html/backend/init_fresh_database.php && \
+    mv /var/www/html/data/database.sqlite /var/www/html/database_seed.sqlite
 
-# 2. Uploads Seed (Backup existing uploads to seed folder)
-RUN mkdir -p /var/www/html/uploads_seed && \
-    cp -r uploads/* /var/www/html/uploads_seed/
+# Create empty uploads seed folder (for clean installation)
+RUN mkdir -p /var/www/html/uploads_seed
 
 # Copy Entrypoint Script
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -68,9 +70,6 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
     && chmod -R 777 /var/www/html/uploads \
     && chmod -R 777 /var/www/html/data
-
-# Environment Variables
-ENV DB_PATH=/var/www/html/data/database.sqlite
 
 # Expose Port
 EXPOSE 80 22

@@ -1,0 +1,10 @@
+# Facility Management System - Apache Configuration
+
+# Enable directory indexes
+DirectoryIndex index.php index.html
+
+# Security: Prevent access to sensitive files
+<FilesMatch "\.(sqlite|db|sqlite3)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

@@ -165,19 +165,7 @@ try {
         FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE SET NULL
     )");
 
-    // Insert some dummy data if empty
-    $count = $pdo->query("SELECT COUNT(*) FROM facilities")->fetchColumn();
-    if ($count == 0) {
-        $stmt = $pdo->prepare("INSERT INTO facilities (name, type, address, area, construction_year, status, employees, op_hours, hazard_level, manager_name, manager_contact, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-        
-        $stmt->execute([
-            'Main Building', 'Office', '123 Tech Blvd', 5000.5, 2010, 'Active', 150, '9-5', 'Low', 'John Doe', 'john@example.com', 'Headquarters'
-        ]);
-        
-        $stmt->execute([
-            'Warehouse A', 'Warehouse', '456 Storage Ln', 12000, 2015, 'Active', 20, '24/7', 'Medium', 'Jane Smith', 'jane@example.com', 'Storage for raw materials'
-        ]);
-    }
+    // No dummy facilities data for fresh installation
 
     // Insert default admin user if no users exist
     $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
