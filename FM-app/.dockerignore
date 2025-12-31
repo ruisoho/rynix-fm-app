@@ -1,0 +1,13 @@
+.git
+.gitignore
+.vscode
+*.md
+backend/check_deps.py
+backend/update_from_uploads.py
+backend/update_pdf_links.py
+backend/debug_schema.php
+backend/fix_events_schema.php
+backend/verify_import.php
+backend/check_tasks.php
+database_corrupt.sqlite
+verify_all_features.php
