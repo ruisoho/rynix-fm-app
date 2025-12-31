@@ -16,12 +16,16 @@ else
 fi
 
 # 2. Initialize Uploads
-# If uploads directory is empty, copy seed files
+# If uploads directory is empty and seed exists, copy seed files
 if [ -z "$(ls -A $UPLOADS_DIR)" ]; then
-    echo "Initializing uploads from seed..."
-    cp -r /var/www/html/uploads_seed/* $UPLOADS_DIR/
-    chown -R www-data:www-data $UPLOADS_DIR
-    echo "Uploads initialized."
+    if [ -n "$(ls -A /var/www/html/uploads_seed 2>/dev/null)" ]; then
+        echo "Initializing uploads from seed..."
+        cp -r /var/www/html/uploads_seed/* $UPLOADS_DIR/
+        chown -R www-data:www-data $UPLOADS_DIR
+        echo "Uploads initialized."
+    else
+        echo "No seed uploads found - starting with empty uploads directory."
+    fi
 else
     echo "Using existing uploads."
 fi
